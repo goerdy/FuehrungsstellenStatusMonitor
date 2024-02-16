@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="de" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Zugtrupp Dashboard</title>
+    <style>
+        #options > * {
+            margin: 0 auto;
+            border-color: blue;
+            border-width: 2px;
+            border-style: solid;
+            width: 95%; /* oder eine feste Breite */
+            font-size: 2vw; /* Passt die Schriftgröße an die Breite des Viewports an */
+            white-space: nowrap; /* Verhindert Zeilenumbrüche */
+            overflow: hidden; /* Versteckt überfließenden Text */
+
+        }
+
+        #overview > * {
+            margin: 0 auto;
+            text-align: center;
+            border-color: blue;
+            border-width: 2px;
+            border-style: solid;
+            width: 95%; /* oder eine feste Breite */
+            font-size: 5vw; /* Passt die Schriftgröße an die Breite des Viewports an */
+            white-space: nowrap; /* Verhindert Zeilenumbrüche */
+            overflow: hidden; /* Versteckt überfließenden Text */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .widget {
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        #clock {
+            font-size: 100px;
+            text-align: center; /* Zentriert den Inhalt von #clock */
+            color: red;
+            background-color: black;
+        }
+
+        .bold {
+            font-weight: bold; /* Macht den Text fett */
+            font-size: 150px;
+        }
+
+        .unterstrichen {
+            text-decoration: underline;
+        }
+
+        div.einheit {
+            margin-bottom: 1px;
+            margin-top: 1px;
+            padding-top: 1px;
+            font-size: 18px;
+        }
+
+        #gesamtstaerke {
+
+        }
+
+        #headDiv {
+
+
+        }
+
+        #einsatzZeit {
+        }
+
+        #einheitenListe {
+            font-size: 50px;
+            text-align: left;
+            font-size: 50px;
+            text-align: left;
+        }
+
+        .spoiler {
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .formContainer {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .details {
+            font-size: 2vw;
+            text-align: left;
+        }
+
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            /*  padding-right: 80px; /* Platz auf der rechten Seite für den Text */
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .slider-text {
+            position: relative;
+            display: inline-block;
+            vertical-align: top; /* Zentriert den Text vertikal, bezogen auf den Slider */
+            margin-left: 55px; /* Abstand zwischen Slider und Text */
+            user-select: none; /* Verhindert die Textauswahl */
+        }
+
+        /* Dark Mode Styles */
+        .dark-mode {
+            background-color: #333; /* Dunkler Hintergrund */
+            color: #fff; /* Helle Schrift */
+        }
+
+        .dark-mode input[type="text"],
+        .dark-mode input[type="datetime-local"],
+        .dark-mode input[type="number"],
+        .dark-mode button {
+            background-color: #555; /* Dunkler Hintergrund für Input-Felder und Buttons */
+            color: white; /* Helle Schrift */
+            border-color: #777; /* Dunklere Border */
+        }
+
+        /* Optional: Stil für den Slider im Dark Mode anpassen */
+        .dark-mode .slider {
+            background-color: #555;
+        }
+
+        .dark-mode .slider:before {
+            background-color: #aaa;
+        }
+
+
+
+    </style>
+</head>
+<body id="body1">
+<div id="overview">
+    <div id="headDiv">Rufname: Bitte eigenen Rufnamen angeben</div>
+    <div id="clock">Lade Uhrzeit...</div>
+    <div id="gesamtstaerke"></div>
+    <div id="einsatzZeit">Einsatzzeit: Bitte Einsatzbeginn angeben</div>
+    <details class="details">
+        <summary class="details">Einheiten Erfassung</summary>
+        <div id="einheitenListe"></div>
+    </details>
+</div>
+<div id="options">
+    <details class="details">
+        <summary class="details">Einsatzdaten</summary>
+        <form class="details" id="einsatzBeginnForm">
+            <label for="einsatzBeginn">Einsatzbeginn (Datum und Uhrzeit):</label>
+            <input type="datetime-local" id="einsatzBeginn" name="einsatzBeginn" required>
+            <button type="submit">Einsatzzeit starten</button>
+        </form>
+        <form class="details" id="EigeneInformationen">
+            <label for="eigenerFunkrufname">eigener Funkrufname:</label>
+            <input type="text" id="eigenerFunkrufname" name="eigenerFunkrufname" required>
+            <button type="submit">Speichern</button>
+        </form>
+    </details>
+    <details class="details">
+        <summary class="details">Optionen</summary>
+        <label class="switch">
+            <input type="checkbox" id="darkmodeswitch">
+            <span class="slider round"></span>
+            <span class="slider-text">Darkmode</span> <!-- Hinzugefügter Text hier -->
+        </label>
+        <br>
+        <label class="switch">
+            <input type="checkbox" id="Uhrzeitformat">
+            <span class="slider round"></span>
+            <span class="slider-text">Datum und Uhrzeit anstelle von DTG</span> <!-- Hinzugefügter Text hier -->
+        </label>
+    </details>
+
+
+</div>
+
+</body>
+
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        const berlinTime = new Date(now.toLocaleString('en-US', {timeZone: 'Europe/Berlin'}));
+
+        const day = berlinTime.getDate().toString().padStart(2, '0');
+        const hours = berlinTime.getHours().toString().padStart(2, '0');
+        const minutes = berlinTime.getMinutes().toString().padStart(2, '0');
+        const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+        const month = months[berlinTime.getMonth()];
+        const year = berlinTime.getFullYear().toString().substr(-2);
+
+        // Zeitzone anpassen: Z für UTC, für Berlin verwenden wir C (für UTC+1)
+        const timezone = '';
+        const dtgString = `${day} <span class="bold">${hours}${minutes}</span>${timezone} ${month} ${year}`;
+        const clockString = `<span class="bold">${hours}:${minutes}</span>  ${day}.${month}.${year}`;
+        if (localStorage.getItem('noDTG') == "1") {
+            document.getElementById('clock').innerHTML = clockString;
+        } else {
+            document.getElementById('clock').innerHTML = dtgString;
+        }
+    }
+
+    function toggleSpoiler() {
+        const formContainer = document.getElementById('formContainer');
+        formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleSpoiler2() {
+        const formContainer2 = document.getElementById('formContainer2');
+        formContainer2.style.display = formContainer2.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // (Fügen Sie hier den JavaScript-Code für Stärkemeldung hinzu)
+
+    const einheiten = JSON.parse(localStorage.getItem('einheiten')) || [];
+    document.getElementById('einheitenListe').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const Typ = document.getElementById('Typ').value;
+        const fuehrer = parseInt(document.getElementById('fuehrer').value, 10);
+        const unterfuehrer = parseInt(document.getElementById('unterfuehrer').value, 10);
+        const helfer = parseInt(document.getElementById('helfer').value, 10);
+        const Organisation = document.getElementById('Organisation').value;
+        const Ort = document.getElementById('Ort').value;
+        const Rufname = document.getElementById('Rufname').value;
+
+        const einheit = {Organisation, Ort, Rufname, Typ, fuehrer, unterfuehrer, helfer};
+        einheiten.push(einheit);
+        localStorage.setItem('einheiten', JSON.stringify(einheiten));
+
+        aktualisiereEinheitenListe();
+        aktualisiereGesamtstaerke();
+        this.reset(); // Formular zurücksetzen
+    });
+
+    function aktualisiereEinheitenListe() {
+        const einheitenListe = document.getElementById('einheitenListe');
+        einheitenListe.innerHTML = ''; // Liste leeren
+        einheiten.forEach((einheit, index) => {
+            einheitenListe.innerHTML += `${einheit.Organisation} ${einheit.Ort} ${einheit.Rufname} (${einheit.Typ}): ${einheit.fuehrer}/${einheit.unterfuehrer}/${einheit.helfer}//<span class="unterstrichen">${einheit.fuehrer + einheit.unterfuehrer + einheit.helfer}</span> <button onclick="einheitLoeschen(${index})">Löschen</button><br/>`;
+        });
+    }
+
+    function einheitLoeschen(index) {
+        einheiten.splice(index, 1);
+        localStorage.setItem('einheiten', JSON.stringify(einheiten));
+        aktualisiereEinheitenListe();
+        aktualisiereGesamtstaerke();
+    }
+
+    function aktualisiereGesamtstaerke() {
+        const gesamt = einheiten.reduce((acc, einheit) => {
+            acc.fuehrer += einheit.fuehrer;
+            acc.unterfuehrer += einheit.unterfuehrer;
+            acc.helfer += einheit.helfer;
+            return acc;
+        }, {fuehrer: 0, unterfuehrer: 0, helfer: 0});
+
+        const gesamtstaerke = document.getElementById('gesamtstaerke');
+        gesamtstaerke.innerHTML = `${gesamt.fuehrer} / ${gesamt.unterfuehrer} / ${gesamt.helfer} // <span class="unterstrichen">${gesamt.fuehrer + gesamt.unterfuehrer + gesamt.helfer}</span>`;
+    }
+
+    document.getElementById('einsatzBeginnForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const einsatzBeginn = document.getElementById('einsatzBeginn').value;
+        localStorage.setItem('einsatzBeginn', einsatzBeginn);
+        berechneUndZeigeEinsatzzeit();
+    });
+
+
+    document.getElementById('EigeneInformationen').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const eigenerFunkrufname = document.getElementById('eigenerFunkrufname').value;
+        localStorage.setItem('eigenerFunkrufname', eigenerFunkrufname);
+        SetzeEigenerFunkrufname();
+    });
+
+    function SetzeEigenerFunkrufname() {
+        document.getElementById('headDiv').textContent = localStorage.getItem('eigenerFunkrufname').toUpperCase();
+        document.getElementById('eigenerFunkrufname').textContent = localStorage.getItem('eigenerFunkrufname').toUpperCase();
+    }
+
+    function berechneUndZeigeEinsatzzeit() {
+        if (localStorage.getItem('einsatzBeginn') != 0) {
+
+            const einsatzBeginn = new Date(localStorage.getItem('einsatzBeginn'));
+            const jetzt = new Date();
+            const differenz = jetzt - einsatzBeginn; // Differenz in Millisekunden
+
+            const tage = Math.floor(differenz / (1000 * 60 * 60 * 24));
+            const stunden = Math.floor((differenz % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minuten = Math.floor((differenz % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById('einsatzZeit').textContent = `${tage} Tage, ${stunden} Stunden, ${minuten} Minuten`;
+        }
+    }
+
+    // Funktion zum regelmäßigen Aktualisieren der Einsatzzeit
+    setInterval(berechneUndZeigeEinsatzzeit, 60000); // Aktualisiert jede Minute
+
+    // Erstmaliges Berechnen/Aktualisieren beim Laden der Seite
+    if (localStorage.getItem('einsatzBeginn')) {
+        berechneUndZeigeEinsatzzeit();
+    }
+
+    function aktualisiereEinheitenListe() {
+        const einheitenListe = document.getElementById('einheitenListe');
+        einheitenListe.innerHTML = ''; // Liste leeren
+        einheiten.forEach((einheit, index) => {
+            einheitenListe.innerHTML += `
+            <div class="einheit" id="einheit-${index}">
+                <input type="text" value="${einheit.Organisation}" onchange="aktualisiereEinheit(this, ${index}, 'Organisation')">
+                <input type="text" value="${einheit.Ort}" onchange="aktualisiereEinheit(this, ${index}, 'Ort')">
+                <input type="text" value="${einheit.Rufname}" onchange="aktualisiereEinheit(this, ${index}, 'Rufname')">
+                <input type="text" value="${einheit.Typ}" onchange="aktualisiereEinheit(this, ${index}, 'Typ')">
+                <input type="number" style="width:40px;" value="${einheit.fuehrer}" onchange="aktualisiereEinheit(this, ${index}, 'fuehrer')">
+                <input type="number" style="width:40px;" value="${einheit.unterfuehrer}" onchange="aktualisiereEinheit(this, ${index}, 'unterfuehrer')">
+                <input type="number" style="width:40px;" value="${einheit.helfer}" onchange="aktualisiereEinheit(this, ${index}, 'helfer')">
+                <button onclick="loescheEinheit(${index})">Löschen</button>
+            </div>
+        `;
+
+        });
+        einheitenListe.innerHTML += `
+                <div class="einheit">
+                <form id="einheitForm">
+                <input type="text" id="Organisation" placeholder="Orga" required>
+                <input type="text" id="Ort" placeholder="Ort" required>
+                <input type="text" id="Rufname" placeholder="Funkrufname" required>
+                <input type="text" id="Typ" placeholder="Einheitentyp" required>
+                <input type="number" style="width:40px;" id="fuehrer" placeholder="Fü" required>
+                <input type="number" style="width:40px;" id="unterfuehrer" placeholder="uF" required>
+                <input type="number" style="width:40px;" id="helfer" placeholder="He" required>
+                <button type="submit">Einheit hinzufügen</button>
+                </form></div>`;
+    }
+
+    function aktualisiereEinheit(element, index, eigenschaft) {
+        const wert = element.type === 'number' ? parseInt(element.value, 10) : element.value;
+        einheiten[index][eigenschaft] = wert;
+        localStorage.setItem('einheiten', JSON.stringify(einheiten));
+        aktualisiereGesamtstaerke();
+    }
+
+    function loescheEinheit(index) {
+        einheiten.splice(index, 1);
+        localStorage.setItem('einheiten', JSON.stringify(einheiten));
+        aktualisiereEinheitenListe();
+        aktualisiereGesamtstaerke(); // Stellen Sie sicher, dass diese Funktion existiert und korrekt die Gesamtstärke aktualisiert
+    }
+
+    document.getElementById('darkmodeswitch').addEventListener('change', function () {
+        if (this.checked) {
+            // Die Checkbox ist markiert, aktiviere Dark Mode
+            aktiviereDarkMode();
+        } else {
+            // Die Checkbox ist nicht markiert, deaktiviere Dark Mode
+            deaktiviereDarkMode();
+        }
+    });
+    document.getElementById('Uhrzeitformat').addEventListener('change', function () {
+        if (this.checked) {
+            // Die Checkbox ist markiert, aktiviere Dark Mode
+            localStorage.setItem('noDTG', "1");
+        } else {
+            localStorage.setItem('noDTG', "0");
+        }
+        updateClock();
+    });
+
+    function aktiviereDarkMode() {
+        // Beispiel für Dark Mode Aktionen
+        document.body.style.backgroundColor = "black";
+        document.body.style.color = "white";
+        document.body.classList.add("dark-mode");
+        console.log("Dark Mode aktiviert");
+
+    }
+
+    function deaktiviereDarkMode() {
+        // Beispiel für Light Mode Aktionen
+        document.body.style.backgroundColor = "white";
+        document.body.style.color = "black";
+        document.body.classList.remove("dark-mode");
+        console.log("Dark Mode deaktiviert");
+    }
+
+
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial update
+    aktualisiereEinheitenListe();
+    aktualisiereGesamtstaerke();
+    SetzeEigenerFunkrufname();
+</script>
+
+</html>
+
+    
+
+
+

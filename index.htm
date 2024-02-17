@@ -222,7 +222,7 @@
             <label for="eigenerFunkrufname">Eigener Funkrufname:</label>
             <input id="eigenerFunkrufname" name="eigenerFunkrufname" required type="text">
             <label for="BezeichnungFüSt">Eigene Bezeichnung für FüSt</label>
-            <input id="BezeichnungFüSt" name="BezeichnungFüSt" required type="text">
+            <input id="BezeichnungFüSt" name="BezeichnungFüSt"  type="text">
             <button type="submit">Speichern</button>
         </form>
     </details>
@@ -533,13 +533,13 @@
     document.getElementById('fileInput').addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (file) {
-            const bestaetigung = confirm("Möchten Sie diese Aktion wirklich durchführen?");
+            const bestaetigung = confirm("Sicher? Alle bisherigen Daten werden überschreiben!");
             if (bestaetigung) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     const content = e.target.result;
                     importLocalStorage(content); // Nutzt die zuvor definierte Importfunktion
-                    location.reload();
+                    location.reload()
                 };
                 reader.readAsText(file);
             }
@@ -549,7 +549,7 @@
 
     });
     document.getElementById('reset').addEventListener('click', function (event) {
-        const bestaetigung = confirm("Möchten Sie diese Aktion wirklich durchführen?");
+        const bestaetigung = confirm("Sicher das alle Daten gelöscht werden sollen?");
         if (bestaetigung) {
             localStorage.clear();
             location.reload();

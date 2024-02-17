@@ -1,6 +1,6 @@
 # Führungsstellen Status Monitor
 ## Beschreibung
-Eine simple HTML und JS Seite die Lokal ohne Server im Browser läuft um einen Statusmonitor für Führungsfahrzeuge im Katastrophenschutz etc. anzeigen zu können. 
+Eine simple HTML und JS Seite, die lokal ohne Server im Browser läuft um einen Statusmonitor für Führungsfahrzeuge im Katastrophenschutz etc. anzeigen zu können. 
 Ideal für Führungsstellen und Zugtrupps. 
 Mit taktischer Zeit (Datum-Zeit-Gruppe), Einsatzdauer, Stärkemeldung... 
 Mit hellem und dunklem Anzeigemodus. 
@@ -19,4 +19,4 @@ Alle daten werden lokal im Browser verarbeitet und gespeichert.
 Es werden keine externen Skripte oder sonstige Sachen geladen.
 
 ## Feature Requests / Bug reporting...
-Wenn du gerne irgend etwas anders hättest... mach eine Issue auf und ich versuche das umzusetzen wenn die Zeit dafür da ist.
+Wenn du gerne irgendetwas anders hättest... mach eine Issue auf und ich versuche das umzusetzen, wenn die Zeit dafür da ist.

@@ -20,3 +20,7 @@ Es werden keine externen Skripte oder sonstige Sachen geladen.
 
 ## Feature Requests / Bug reporting...
 Wenn du gerne irgendetwas anders hättest... mach eine Issue auf und ich versuche das umzusetzen, wenn die Zeit dafür da ist.
+
+## Disclaimer
+Status: "Works for me"
+ziemlich miese Codequalität und diverse Fehler und Probleme... mit viel Zeit und Langeweile wird das vielleicht noch Mal besser.

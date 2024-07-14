@@ -204,6 +204,7 @@
     <div id="FüStDiv">FüSt: Bitte FüSt Bezeichnung angeben</div>
     <div id="clock">Lade Uhrzeit...</div>
     <div id="gesamtstaerke"></div>
+    <div id="ZusatzeingabenStaerke"></div>
     <div id="einsatzZeit">Einsatzzeit: Bitte Einsatzbeginn angeben</div>
     <details class="details">
         <summary class="details">Einheiten Erfassung</summary>
@@ -214,8 +215,10 @@
     <details class="details">
         <summary class="details">Einsatzdaten</summary>
         <form class="details" id="einsatzBeginnForm">
-            <label for="einsatzBeginn">Einsatzbeginn (Datum und Uhrzeit):</label>
-            <input id="einsatzBeginn" name="einsatzBeginn" required type="datetime-local">
+            <label for="einsatzBeginndate">Einsatzbeginn Datum:</label>
+            <input id="einsatzBeginndate" name="date" type="date" required>
+            <label for="einsatzBeginntime">Uhrzeit:</label>
+        <input id="einsatzBeginntime" name="time" type="time" required>
             <button type="submit">Einsatzzeit starten</button>
         </form>
         <form class="details" id="EigeneInformationen">
@@ -233,6 +236,7 @@
             <input id="darkmodeswitch" type="checkbox">
             <span class="slider round"></span>
             <span class="slider-text">Darkmode</span> <!-- Hinzugefügter Text hier -->
+
         </label>
         <br>
         <label class="switch">
@@ -240,6 +244,21 @@
             <span class="slider round"></span>
             <span class="slider-text">Datum und Uhrzeit anstelle von DTG</span> <!-- Hinzugefügter Text hier -->
         </label>
+        <br>
+        <label class="switch">
+            <input id="Zusatzfelder" type="checkbox">
+            <span class="slider round"></span>
+            <span class="slider-text">Zusatzdaten zur Stärkemeldung einblenden</span> <!-- Hinzugefügter Text hier -->
+        </label>
+        <form class="details" id="BezeichnungenSOnderfelder">
+            Zusatzfelder für Stärkemeldung:</br>
+            <label for="Custom1">Zusatzfeld 1:</label>
+            <input id="Custom1" name="Zusatzfeld1" type="text"></br>
+            <label for="Custom2">Zusatzfeld 2:</label>
+            <input id="Custom2" name="Zusatzfeld2" type="text"></br>
+            <label for="Custom3">Zusatzfeld 3:</label>
+            <input id="Custom3" name="Zusatzfeld3" type="text"></br>
+        </form>
         <br>
         <br>
         <hr>
@@ -321,8 +340,11 @@
         const Organisation = document.getElementById('Organisation').value;
         const Ort = document.getElementById('Ort').value;
         const Rufname = document.getElementById('Rufname').value;
+        const custom1 = document.getElementById('Neucustom1').value;
+        const custom2 = document.getElementById('Neucustom2').value;
+        const custom3 = document.getElementById('Neucustom3').value;
 
-        const einheit = {Organisation, Ort, Rufname, Typ, fuehrer, unterfuehrer, helfer};
+        const einheit = {Organisation, Ort, Rufname, Typ, fuehrer, unterfuehrer, helfer, custom1, custom2, custom3};
         einheiten.push(einheit);
         localStorage.setItem('einheiten', JSON.stringify(einheiten));
 
@@ -356,11 +378,35 @@
 
         const gesamtstaerke = document.getElementById('gesamtstaerke');
         gesamtstaerke.innerHTML = `${gesamt.fuehrer} / ${gesamt.unterfuehrer} / ${gesamt.helfer} // <span class="unterstrichen">${gesamt.fuehrer + gesamt.unterfuehrer + gesamt.helfer}</span>`;
+            aktualisiereZusatzeingabenStaerke();
+    }
+
+    function aktualisiereZusatzeingabenStaerke() {
+        if(localStorage.getItem('Zusatzeingaben') == 1) {
+            const gesamt = einheiten.reduce((acc, einheit) => {
+                acc.custom1 += Number(einheit.custom1);
+                acc.custom2 += Number(einheit.custom2);
+                acc.custom3 += Number(einheit.custom3);
+                return acc;
+            }, {custom1: 0, custom2: 0, custom3: 0});
+
+            const Zusatz = document.getElementById('ZusatzeingabenStaerke');
+            //Zusatz.innerHTML = `<table><tr><th>${localStorage.getItem('custom1')}</th><th>${localStorage.getItem('custom2')}</th><th>${localStorage.getItem('custom3')}</th></tr><tr><th>${gesamt.custom1}</th><th>${gesamt.custom2}</th><th>${gesamt.custom3}</th></tr></table>`;
+            Zusatz.innerHTML =`${localStorage.getItem('custom1')}: ${gesamt.custom1} | ${localStorage.getItem('custom2')}: ${gesamt.custom2} | ${localStorage.getItem('custom3')}: ${gesamt.custom3}`;
+        }
+        else
+        {
+            const Zusatz = document.getElementById('ZusatzeingabenStaerke');
+            Zusatz.innerHTML = ``;
+        }
     }
 
     document.getElementById('einsatzBeginnForm').addEventListener('submit', function (e) {
         e.preventDefault();
-        const einsatzBeginn = document.getElementById('einsatzBeginn').value;
+        const date = document.getElementById('einsatzBeginndate').value;
+        const time = document.getElementById('einsatzBeginntime').value;
+
+        const einsatzBeginn =  `${date}T${time}`;
         localStorage.setItem('einsatzBeginn', einsatzBeginn);
         berechneUndZeigeEinsatzzeit();
     });
@@ -392,7 +438,7 @@
 
 
     function berechneUndZeigeEinsatzzeit() {
-        if (localStorage.getItem('einsatzBeginn') != 0) {
+        if (localStorage.getItem('einsatzBeginn') != null) {
 
             const einsatzBeginn = new Date(localStorage.getItem('einsatzBeginn'));
             const jetzt = new Date();
@@ -403,6 +449,10 @@
             const minuten = Math.floor((differenz % (1000 * 60 * 60)) / (1000 * 60));
 
             document.getElementById('einsatzZeit').textContent = `${tage} Tage, ${stunden} Stunden, ${minuten} Minuten`;
+        }
+        else
+        {
+            document.getElementById('einsatzZeit').textContent = `Einsatzzeit: Bitte Einsatzbeginn angeben`;
         }
     }
 
@@ -417,6 +467,20 @@
     function aktualisiereEinheitenListe() {
         const einheitenListe = document.getElementById('einheitenListe');
         einheitenListe.innerHTML = ''; // Liste leeren
+        einheitenListe.innerHTML += `
+            <div class="einheit" id="einheit-header">
+                <input type="text" value="Organisation" disabled>
+                <input type="text" value="Ort" disabled>
+                <input type="text" value="Rufname" disabled>
+                <input type="text" value="Typ" disabled>
+                <input type="text" min="0" style="width:40px;" value="FÜ" disabled>
+                <input type="text" min="0" style="width:40px;" value="UF" disabled>
+                <input type="text" min="0" style="width:40px;" value="HE" disabled>
+                <input type="text" min="0" style="width:40px;" value="${localStorage.getItem('custom1')}" disabled>
+                <input type="text" min="0" style="width:40px;" value="${localStorage.getItem('custom2')}" disabled>
+                <input type="text" min="0" style="width:40px;" value="${localStorage.getItem('custom3')}" disabled>
+            </div>
+        `;
         einheiten.forEach((einheit, index) => {
             einheitenListe.innerHTML += `
             <div class="einheit" id="einheit-${index}">
@@ -427,6 +491,10 @@
                 <input type="number" min="0" style="width:40px;" value="${einheit.fuehrer}" onchange="aktualisiereEinheit(this, ${index}, 'fuehrer')">
                 <input type="number" min="0" style="width:40px;" value="${einheit.unterfuehrer}" onchange="aktualisiereEinheit(this, ${index}, 'unterfuehrer')">
                 <input type="number" min="0" style="width:40px;" value="${einheit.helfer}" onchange="aktualisiereEinheit(this, ${index}, 'helfer')">
+                <input type="number" min="0" style="width:40px;" value="${einheit.custom1}" onchange="aktualisiereEinheit(this, ${index}, 'custom1')">
+                <input type="number" min="0" style="width:40px;" value="${einheit.custom2}" onchange="aktualisiereEinheit(this, ${index}, 'custom2')">
+                <input type="number" min="0" style="width:40px;" value="${einheit.custom3}" onchange="aktualisiereEinheit(this, ${index}, 'custom3')">
+
                 <button onclick="loescheEinheit(${index})">Löschen</button>
             </div>
         `;
@@ -442,6 +510,9 @@
                 <input type="number" min="0" value="0" style="width:40px;" id="fuehrer" placeholder="Fü" required>
                 <input type="number" min="0" value="0" style="width:40px;" id="unterfuehrer" placeholder="uF" required>
                 <input type="number" min="0" value="0" style="width:40px;" id="helfer" placeholder="He" required>
+                <input type="number" min="0" value="0" style="width:40px;" id="Neucustom1">
+                <input type="number" min="0" value="0" style="width:40px;" id="Neucustom2">
+                <input type="number" min="0" value="0" style="width:40px;" id="Neucustom3">
                 <button type="submit">Einheit hinzufügen</button>
                 </form></div>`;
     }
@@ -459,6 +530,19 @@
         aktualisiereEinheitenListe();
         aktualisiereGesamtstaerke(); // Stellen Sie sicher, dass diese Funktion existiert und korrekt die Gesamtstärke aktualisiert
     }
+
+    document.getElementById('Custom1').addEventListener('change', function (){
+        localStorage.setItem('custom1', document.getElementById('Custom1').value)
+        updateeverithing();
+    });
+    document.getElementById('Custom2').addEventListener('change', function (){
+        localStorage.setItem('custom2', document.getElementById('Custom2').value)
+        updateeverithing();
+    });
+    document.getElementById('Custom3').addEventListener('change', function (){
+        localStorage.setItem('custom3', document.getElementById('Custom3').value)
+        updateeverithing();
+    });
 
     document.getElementById('darkmodeswitch').addEventListener('change', function () {
         if (this.checked) {
@@ -479,6 +563,14 @@
             localStorage.setItem('noDTG', "0");
         }
         updateClock();
+    });
+    document.getElementById('Zusatzfelder').addEventListener('change', function () {
+        if (this.checked) {
+            localStorage.setItem('Zusatzeingaben', "1");
+        } else {
+            localStorage.setItem('Zusatzeingaben', "0");
+        }
+        updateeverithing();
     });
 
     function aktiviereDarkMode() {
@@ -573,7 +665,22 @@
             document.getElementById("darkmodeswitch").checked = false;
             deaktiviereDarkMode();
             console.log("Dark Mode deaktiviert");
+            console.log("Dark Mode deaktiviert");
         }
+        document.getElementById("Custom1").value = localStorage.getItem('custom1');
+        document.getElementById("Custom2").value = localStorage.getItem('custom2');
+        document.getElementById("Custom3").value = localStorage.getItem('custom3');
+        document.getElementById("BezeichnungFüSt").value = localStorage.getItem('BezeichnungFüSt');
+        document.getElementById("eigenerFunkrufname").value = localStorage.getItem('eigenerFunkrufname');
+        document.getElementById("einsatzBeginn").value = localStorage.getItem('einsatzBeginn');
+
+        if(localStorage.getItem('darkmode') == 1)
+        {
+            aktiviereDarkMode();
+            document.getElementById("darkmodeswitch").checked = true;
+        }
+
+        document.getElementById("Uhrzeitformat").checked = localStorage.getItem('noDTG');
     }
 
     updateeverithing();

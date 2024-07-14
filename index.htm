@@ -672,15 +672,40 @@
         document.getElementById("Custom3").value = localStorage.getItem('custom3');
         document.getElementById("BezeichnungFüSt").value = localStorage.getItem('BezeichnungFüSt');
         document.getElementById("eigenerFunkrufname").value = localStorage.getItem('eigenerFunkrufname');
-        document.getElementById("einsatzBeginn").value = localStorage.getItem('einsatzBeginn');
+        //document.getElementById("einsatzBeginn").value = localStorage.getItem('einsatzBeginn');
 
         if(localStorage.getItem('darkmode') == 1)
         {
             aktiviereDarkMode();
             document.getElementById("darkmodeswitch").checked = true;
         }
+        else
+        {
+            deaktiviereDarkMode();
+            document.getElementById("darkmodeswitch").checked = false;
+        }
 
-        document.getElementById("Uhrzeitformat").checked = localStorage.getItem('noDTG');
+        if(localStorage.getItem('noDTG') == 1)
+        {
+            document.getElementById("Uhrzeitformat").checked = true;
+        }
+        else
+        {
+            document.getElementById("Uhrzeitformat").checked = false;
+        }
+
+        if(localStorage.getItem('Zusatzeingaben') == 1)
+        {
+            document.getElementById("Zusatzfelder").checked = true;
+        }
+        else
+        {
+            document.getElementById("Zusatzfelder").checked = false;
+        }
+
+        const datum = new Date(Date.parse(localStorage.getItem("einsatzBeginn")));
+        document.getElementById("einsatzBeginndate").value = datum.toISOString().substring(0, 10);
+        document.getElementById("einsatzBeginntime").value = datum.getHours()+":"+datum.getMinutes();
     }
 
     updateeverithing();
